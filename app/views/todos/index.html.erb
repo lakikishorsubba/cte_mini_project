@@ -1,0 +1,23 @@
+<h1 class="text-3xl font-bold mb-6">Tasks</h1>
+
+<%= link_to "New Todo", new_todo_path, class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" %>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+  <% @todos.each do |todo| %>
+    <div class="bg-white p-4 rounded shadow hover:shadow-lg transition">
+      <h2 class="text-xl font-semibold <%= 'line-through text-gray-400' if todo.completed %>">
+        <%= todo.title %>
+      </h2>
+      <p class="mt-2 <%= 'line-through text-gray-400' if todo.completed %>">
+        <%= todo.description %>
+      </p>
+      <p class="mt-2 text-sm text-gray-500">
+        Status: <%= todo.completed ? "Completed ✅" : "Pending ⏳" %>
+      </p>
+      <div class="mt-4 flex justify-between">
+        <%= link_to "Edit", edit_todo_path(todo), class: "text-blue-500 hover:text-blue-700" %>
+        <%= link_to "Destroy", todo_path(todo), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-500 hover:text-red-700" %>
+      </div>
+    </div>
+  <% end %>
+</div>

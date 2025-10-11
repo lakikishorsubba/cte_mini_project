@@ -1,0 +1,23 @@
+<!-- app/views/todos/_form.html.erb -->
+
+<%= form_with(model: todo, local: true, class: "bg-white p-6 rounded shadow space-y-4") do |form| %>
+  <div>
+    <%= form.label :title, class: "block font-medium mb-1" %>
+    <%= form.text_field :title, class: "w-full border p-2 rounded" %>
+  </div>
+
+  <div>
+    <%= form.label :description, class: "block font-medium mb-1" %>
+    <%= form.text_area :description, class: "w-full border p-2 rounded" %>
+  </div>
+
+  <div class="flex items-center space-x-2">
+    <%= form.check_box :completed %>
+    <%= form.label :completed, class: "font-medium" %>
+  </div>
+
+  <div class="flex space-x-4">
+    <%= form.submit class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" %>
+    <%= link_to "Back", todos_path, class: "text-gray-500 hover:text-gray-700 px-4 py-2" %>
+  </div>
+<% end %>

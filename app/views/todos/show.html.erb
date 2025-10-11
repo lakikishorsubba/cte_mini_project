@@ -1,0 +1,12 @@
+<div class="bg-white p-6 rounded shadow">
+  <h2 class="text-2xl font-bold mb-2"><%= @todo.title %></h2>
+  <p class="mb-2"><%= @todo.description %></p>
+  <p class="text-sm text-gray-500 mb-4">
+    Status: <%= @todo.completed ? "Completed ✅" : "Pending ⏳" %>
+  </p>
+  <div class="flex space-x-4">
+    <%= link_to "Edit", edit_todo_path(@todo), class: "text-blue-500 hover:text-blue-700" %>
+    <%= link_to "Back", todos_path, class: "text-gray-500 hover:text-gray-700" %>
+    <%= link_to "Destroy", @todo, method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-500 hover:text-red-700" %>
+  </div>
+</div>

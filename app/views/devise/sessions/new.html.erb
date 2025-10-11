@@ -1,0 +1,33 @@
+<!-- app/views/devise/sessions/new.html.erb -->
+
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-8">
+    <h2 class="text-2xl font-semibold text-center mb-6">Login</h2>
+
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <div class="mb-4">
+        <%= f.label :email, class: "block text-gray-700 mb-1" %>
+        <%= f.email_field :email, autofocus: true, class: "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" %>
+      </div>
+
+      <div class="mb-4">
+        <%= f.label :password, class: "block text-gray-700 mb-1" %>
+        <%= f.password_field :password, autocomplete: "current-password", class: "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" %>
+      </div>
+
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <%= f.check_box :remember_me, class: "mr-1" %>
+          <%= f.label :remember_me, class: "text-gray-700" %>
+        </div>
+        <%= link_to "Forgot password?", new_user_password_path, class: "text-blue-500 hover:underline text-sm" %>
+      </div>
+
+      <%= f.submit "Log in", class: "w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600" %>
+    <% end %>
+
+    <div class="mt-6 text-center text-sm">
+      Don't have an account? <%= link_to "Sign up", new_user_registration_path, class: "text-blue-500 hover:underline" %>
+    </div>
+  </div>
+</div>
