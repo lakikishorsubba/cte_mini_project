@@ -19,7 +19,8 @@ RUN apt-get update -qq && \
 ENV RAILS_ENV=production \
     BUNDLE_DEPLOYMENT=1 \
     BUNDLE_PATH=/usr/local/bundle \
-    BUNDLE_WITHOUT="development test"
+    BUNDLE_WITHOUT="development test" \
+    SECRET_KEY_BASE=dummysecret
 
 # ===============================
 # Stage 2: Build Dependencies
@@ -36,7 +37,7 @@ COPY . .
 
 # Precompile Bootsnap and assets
 RUN bundle exec bootsnap precompile app/ lib/ && \
-    SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+    ./bin/rails assets:precompile
 
 # ===============================
 # Stage 3: Final Runtime Image
@@ -53,11 +54,11 @@ RUN groupadd --system rails && \
     chown -R rails:rails /rails
 USER rails
 
-# Expose port 80
-EXPOSE 80
+# Expose port 3000
+EXPOSE 3000
 
 # Entrypoint for Rails
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start Rails using Thruster (or Puma)
-CMD ["./bin/thrust", "./bin/rails", "server"]
+# Start Rails server on 0.0.0.0 so it's accessible from outside
+CMD ["./bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
