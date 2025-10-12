@@ -1,64 +1,37 @@
-# syntax=docker/dockerfile:1
-# check=error=true
+FROM ruby:3.4.5-slim
 
-# ===============================
-# Stage 1: Base Image
-# ===============================
-ARG RUBY_VERSION=3.4.5
-FROM ruby:${RUBY_VERSION}-slim AS base
-
+# Set working directory
 WORKDIR /rails
 
-# Install base packages
+# Set noninteractive to avoid prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    build-essential git curl libjemalloc2 libvips postgresql-client libpq-dev libyaml-dev pkg-config && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    curl \
+    libjemalloc2 \
+    libvips42 \
+    postgresql-client \
+    libpq-dev \
+    libyaml-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables for Rails
-ENV RAILS_ENV=production \
-    BUNDLE_DEPLOYMENT=1 \
-    BUNDLE_PATH=/usr/local/bundle \
-    BUNDLE_WITHOUT="development test"
-    
+# Copy Gemfile and install gems
+COPY Gemfile* ./
+RUN bundle install
 
-# ===============================
-# Stage 2: Build Dependencies
-# ===============================
-FROM base AS build
-
-# Copy gem files and install gems
-COPY Gemfile Gemfile.lock ./
-RUN bundle install --without development test && \
-    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache
-
-# Copy application code
+# Copy the rest of the app
 COPY . .
 
-# Precompile Bootsnap and assets
-RUN bundle exec bootsnap precompile app/ lib/ && \
-    ./bin/rails assets:precompile
+# Precompile assets (if Rails API with frontend, optional)
+# RUN bundle exec rails assets:precompile
 
-# ===============================
-# Stage 3: Final Runtime Image
-# ===============================
-FROM base
-
-# Copy built gems and app
-COPY --from=build /usr/local/bundle /usr/local/bundle
-COPY --from=build /rails /rails
-
-# Create and use a non-root user
-RUN groupadd --system rails && \
-    useradd rails --system --gid rails --create-home && \
-    chown -R rails:rails /rails
-USER rails
-
-# Expose port 3000
+# Expose default port
 EXPOSE 3000
 
-# Entrypoint for Rails
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
-
-# Start Rails server on 0.0.0.0 so it's accessible from outside
-CMD ["./bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
+# Start Rails server
+CMD ["rails", "server", "-b", "0.0.0.0"]
