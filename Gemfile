@@ -1,5 +1,9 @@
 source "https://rubygems.org"
 gem "devise"
+group :development, :test do
+  gem "rspec-rails"
+end
+
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.0.3"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
