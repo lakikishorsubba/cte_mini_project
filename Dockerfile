@@ -19,8 +19,8 @@ RUN apt-get update -qq && \
 ENV RAILS_ENV=production \
     BUNDLE_DEPLOYMENT=1 \
     BUNDLE_PATH=/usr/local/bundle \
-    BUNDLE_WITHOUT="development test" \
-    SECRET_KEY_BASE=dummysecret
+    BUNDLE_WITHOUT="development test"
+    
 
 # ===============================
 # Stage 2: Build Dependencies
