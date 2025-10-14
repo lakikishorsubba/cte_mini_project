@@ -1,5 +1,5 @@
 require 'rails_helper'
-
+# check email and password presence for user model
 RSpec.describe User, type: :model do
   it "is valid with an email and password" do
     user = User.new(email: "test@example.com", password: "123456")
