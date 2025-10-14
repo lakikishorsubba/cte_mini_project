@@ -1,5 +1,5 @@
 require 'rails_helper'
-# check title and description presence for todo model but first create a user to associate with the todo
+# check title and description presence for todo model but first create a user or user must be associated with the todo
 RSpec.describe Todo, type: :model do
   let(:user) { User.create!(email: "test@example.com", password: "password") }
 
