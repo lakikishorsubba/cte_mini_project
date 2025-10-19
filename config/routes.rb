@@ -1,17 +1,22 @@
 Rails.application.routes.draw do
+  # Root path of the application
+  # This is the page that loads when someone visits your app at "/"
   root "todos#index"
+
+  # Devise routes for user authentication
+  # We override only the sessions controller to set JWT cookies after sign-in and clear them on sign-out
+  # Registrations controller is kept default (or you can override later if needed)
+  devise_for :users,
+             controllers: {
+               sessions: 'users/sessions'
+             }
+
+  # Resources for Todos
+  # Standard RESTful routes: index, show, new, create, edit, update, destroy
+  # Protected via `before_action :authenticate_user!` in TodosController
   resources :todos
-  devise_for :users
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # Health check route
+  # Optional endpoint that can be pinged by monitoring tools
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
-  # root "posts#index"
 end

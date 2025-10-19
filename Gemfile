@@ -1,5 +1,6 @@
 source "https://rubygems.org"
 gem "devise"
+gem 'devise-jwt'
 group :development, :test do
   gem "rspec-rails"
 end
