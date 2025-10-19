@@ -25,6 +25,7 @@ jobs:
 
     env:
       RAILS_ENV: test
+      DEVISE_JWT_SECRET_KEY: "test_jwt_secret_1234567890"
       DATABASE_URL: postgresql://postgres:password@localhost:5432/test_db
 
     steps:
