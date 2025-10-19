@@ -304,18 +304,21 @@ Devise.setup do |config|
   # Note: These might become the new default in future versions of Devise.
   config.responder.error_status = :unprocessable_entity
   config.responder.redirect_status = :see_other
+  Devise.setup do |config|
+  # your other Devise config...
 
   config.jwt do |jwt|
-  jwt.secret = ENV['DEVISE_JWT_SECRET_KEY'] || Rails.application.credentials.devise_jwt_secret_key!
-  jwt.dispatch_requests = [
-    ['POST', %r{^/login$}],
-    ['POST', %r{^/users/sign_in$}]
-  ]
-  jwt.revocation_requests = [
-    ['DELETE', %r{^/logout$}],
-    ['DELETE', %r{^/users/sign_out$}]
-  ]
-  jwt.expiration_time = 30.minutes.to_i
+    # You can use a dummy secret locally
+    jwt.secret = Rails.application.credentials.devise_jwt_secret_key || 'dummy_secret_for_local'
+    
+    jwt.dispatch_requests = [
+      ['POST', %r{^/users/sign_in$}]
+    ]
+    jwt.revocation_requests = [
+      ['DELETE', %r{^/users/sign_out$}]
+    ]
+    jwt.expiration_time = 30.minutes.to_i
+  end
 end
 
   # ==> Configuration for :registerable
@@ -324,5 +327,3 @@ end
   # changed. Defaults to true, so a user is signed in automatically after changing a password.
   # config.sign_in_after_change_password = true
 end
-# ==> JWT configuration
-

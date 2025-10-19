@@ -4,8 +4,8 @@ Rails.application.routes.draw do
   root "todos#index"
 
   # Devise routes for user authentication
-  # We override only the sessions controller to set JWT cookies after sign-in and clear them on sign-out
-  # Registrations controller is kept default (or you can override later if needed)
+  # We override only the sessions controller to set JWT cookies after sign-in
+  # and clear them on sign-out. Registrations controller is default.
   devise_for :users,
              controllers: {
                sessions: 'users/sessions'
@@ -16,7 +16,4 @@ Rails.application.routes.draw do
   # Protected via `before_action :authenticate_user!` in TodosController
   resources :todos
 
-  # Health check route
-  # Optional endpoint that can be pinged by monitoring tools
-  get "up" => "rails/health#show", as: :rails_health_check
 end
