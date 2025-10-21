@@ -15,5 +15,4 @@ Rails.application.routes.draw do
   # Standard RESTful routes: index, show, new, create, edit, update, destroy
   # Protected via `before_action :authenticate_user!` in TodosController
   resources :todos
-
 end

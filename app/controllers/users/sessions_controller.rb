@@ -4,8 +4,8 @@ class Users::SessionsController < Devise::SessionsController
   # POST /users/sign_in
   def create
     super do |resource|
-      # Only set cookie if JWT token exists (devise-jwt does this automatically)
-      if request.env['warden-jwt_auth.token'].present?
+      # Only set cookie if JWT token exists 
+      if request.env['warden-jwt_auth.token'].present?(devise-jwt does this automatically)
         token = request.env['warden-jwt_auth.token']
 
         cookies[:jwt] = {
@@ -16,7 +16,6 @@ class Users::SessionsController < Devise::SessionsController
           expires: Time.current + 30.minutes
         }
       end
-      # Do not yield or break; just end super
     end
   end
 
