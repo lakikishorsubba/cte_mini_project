@@ -1,6 +1,8 @@
+# Use the official Ruby image as a base
 FROM ruby:3.4.5-slim
+# Set the working directory
 WORKDIR /rails
-
+# Install dependencies
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
@@ -14,9 +16,9 @@ RUN apt-get update -qq && \
     libyaml-dev \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
-
+# Install Node.js and Yarn
 COPY Gemfile* ./
-
+# Install bundler
 RUN bundle install
 
 COPY . .
