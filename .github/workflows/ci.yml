@@ -1,14 +1,16 @@
 name: CI Pipeline
+
 on:
   push:
-    branches: [ main, cicd ]
+    branches: [main, cicd]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
     name: Run RSpec Tests
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:15-alpine
@@ -16,17 +18,18 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
           POSTGRES_DB: test_db
-        ports: ["5432:5432"]
+        ports:
+          - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd pg_isready -U postgres
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
     env:
       RAILS_ENV: test
-      DEVISE_JWT_SECRET_KEY: "test_jwt_secret_1234567890"
       DATABASE_URL: postgresql://postgres:password@localhost:5432/test_db
+      DEVISE_JWT_SECRET_KEY: "test_jwt_secret_1234567890"
 
     steps:
       - name: Checkout code
@@ -38,19 +41,15 @@ jobs:
           ruby-version: 3.4.5
           bundler-cache: true
 
-      - name: Set up Node & Yarn
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-      - name: Install JavaScript dependencies
+      - name: Install JS dependencies
         run: yarn install --check-files
 
-      - name: Set up database
+      - name: Prepare test database
         run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-          bundle exec rails db:create db:schema:load RAILS_ENV=test
+          bundle exec rails db:create db:schema:load
 
       - name: Run RSpec tests
         run: bundle exec rspec --format documentation --color

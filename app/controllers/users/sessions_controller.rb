@@ -1,11 +1,9 @@
 class Users::SessionsController < Devise::SessionsController
   respond_to :html, :json
 
-  # POST /users/sign_in
   def create
     super do |resource|
-      # Only set cookie if JWT token exists 
-      if request.env['warden-jwt_auth.token'].present?(devise-jwt does this automatically)
+      if request.env['warden-jwt_auth.token'].present?
         token = request.env['warden-jwt_auth.token']
 
         cookies[:jwt] = {
