@@ -22,7 +22,7 @@ jobs:
           username: ${{ vars.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build and Push Multi-Stage Image
+      - name: Build and push image
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -31,5 +31,5 @@ jobs:
           tags: |
             ${{ vars.DOCKER_HUB_USERNAME }}/cte412miniproject:latest
             ${{ vars.DOCKER_HUB_USERNAME }}/cte412miniproject:${{ github.sha }}
-          cache-from: type=registry,ref=${{ vars.DOCKER_HUB_USERNAME }}/cte412miniproject:latest
-          cache-to: type=inline
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

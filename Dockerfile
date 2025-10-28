@@ -1,58 +1,42 @@
-# Builder Stage — Install deps and precompile
+# ---------- Stage 1: Builder ----------
+FROM ruby:3.2-slim AS builder
 
-FROM ruby:3.4.5-slim AS builder
+WORKDIR /app
+ENV RAILS_ENV=production
 
-WORKDIR /rails
-
-ENV RAILS_ENV=production \
-    BUNDLE_WITHOUT="development test" \
-    DEBIAN_FRONTEND=noninteractive
-
-# Install required OS packages
+# Install system dependencies
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
-    build-essential \
-    git \
-    curl \
-    libjemalloc2 \
-    libvips42 \
-    libpq-dev \
-    libyaml-dev \
-    pkg-config \
-    nodejs \
-    yarn \
-    postgresql-client && \
+      build-essential git curl libvips42 libpq-dev libyaml-dev pkg-config postgresql-client && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g yarn && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy gem definitions and install dependencies
+# Install gems
 COPY Gemfile Gemfile.lock ./
-RUN bundle install --jobs 4
+RUN bundle install --without development test
 
-# Copy full app and precompile assets
+# Copy app source
 COPY . .
-RUN bundle exec rails assets:precompile
 
-# 2️⃣ Final Runtime Stage — Lightweight image
-FROM ruby:3.4.5-slim
+# Precompile assets
+RUN RAILS_ENV=production SECRET_KEY_BASE=dummy rails assets:precompile
 
-WORKDIR /rails
 
-ENV RAILS_ENV=production \
-    BUNDLE_WITHOUT="development test" \
-    DEBIAN_FRONTEND=noninteractive
+# ---------- Stage 2: Runtime ----------
+FROM ruby:3.2-slim AS runtime
 
-# Install only runtime dependencies
+WORKDIR /app
+ENV RAILS_ENV=production
+
+# Install minimal runtime deps
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends \
-    libjemalloc2 \
-    libvips42 \
-    postgresql-client && \
+    apt-get install -y --no-install-recommends libvips42 postgresql-client && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy built gems & app from builder stage
-COPY --from=builder /usr/local/bundle /usr/local/bundle
-COPY --from=builder /rails /rails
+# Copy compiled app from builder
+COPY --from=builder /app /app
 
 EXPOSE 3000
-
-CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
+CMD ["rails", "server", "-b", "0.0.0.0"]

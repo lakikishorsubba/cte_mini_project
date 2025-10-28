@@ -18,8 +18,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
           POSTGRES_DB: test_db
-        ports:
-          - 5432:5432
+        ports: ["5432:5432"]
         options: >-
           --health-cmd pg_isready -U postgres
           --health-interval 10s
@@ -38,16 +37,25 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.4.5
+          ruby-version: 3.2
           bundler-cache: true
 
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Set up Node & Yarn
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Install JS dependencies
         run: yarn install --check-files
 
-      - name: Prepare test database
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for postgres...";
+            sleep 3;
+          done
+
+      - name: Set up database
         run: |
           bundle exec rails db:create db:schema:load
 
