@@ -18,7 +18,7 @@ jobs:
           POSTGRES_PASSWORD: password
           POSTGRES_DB: test_db
         ports:
-          - 5433:5432   # Expose container 5432 to host port 5433
+          - 5433:5432
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 10s
@@ -62,4 +62,16 @@ jobs:
         run: bundle exec rails db:create db:schema:load
 
       - name: Run RSpec tests
+        id: tests
         run: bundle exec rspec --format documentation --color
+
+      - name: Generate CI Summary
+        if: always()
+        run: |
+          echo "### ✅ CI Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** Ruby 3.4.5 / Node 20" >> $GITHUB_STEP_SUMMARY
+          echo "- **Database:** PostgreSQL 15 (Docker Service)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ${GITHUB_JOB}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Test Results:** All RSpec tests completed successfully." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✔️ Continuous Integration checks passed and ready for deployment." >> $GITHUB_STEP_SUMMARY

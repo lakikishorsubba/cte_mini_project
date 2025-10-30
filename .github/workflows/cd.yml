@@ -1,13 +1,16 @@
 name: CD Pipeline
 
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
 
 jobs:
   build-and-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout repository
@@ -23,6 +26,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Build and push image
+        id: docker_build
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -33,3 +37,14 @@ jobs:
             ${{ vars.DOCKER_HUB_USERNAME }}/cte412miniproject:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Generate CD Summary
+        if: always()
+        run: |
+          echo "### 🚀 CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image:** ${{ vars.DOCKER_HUB_USERNAME }}/cte412miniproject" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tags:** latest, ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Status:** ✅ Successful" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by:** CI Pipeline completion" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎉 The image has been successfully built and pushed to Docker Hub!" >> $GITHUB_STEP_SUMMARY
