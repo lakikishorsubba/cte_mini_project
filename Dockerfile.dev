@@ -2,7 +2,6 @@ FROM ruby:3.4.5-slim
 
 WORKDIR /app
 
-# Install system dependencies + Node.js
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
     build-essential \
@@ -14,20 +13,16 @@ RUN apt-get update -qq && \
     gnupg2 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js (official repo)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
-# Install Yarn via official Yarn APT repo
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install -y yarn
 
-# Install gems
 COPY Gemfile* ./
 RUN bundle install
 
-# Copy app code
 COPY . .
 
 EXPOSE 3000
